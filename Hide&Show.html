@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+$(document).ready(function(){
+  $("#hide").click(function(){
+    $("p").hide();
+  });
+  $("#show").click(function(){
+    $("p").show();
+  });
+  $("#focus").focus(function(){
+    $("body").css("background-color", "yellow");
+  });
+});
+</script>
+</head>
+<body>
+    <p style="color:purple;"> This the task given in the class.</p>
+<button id="hide">Hide</button>
+<button id="show">Show</button>
+<button id="focus">Change Color</button>
+</body>
+</html>
