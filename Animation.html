@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Animation</title>
+
+  <!-- jQuery included -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    body {
+      height: 100vh;
+    }
+
+    #box {
+      width: 100px;
+      height: 100px;
+      background-color: blueviolet;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    button {
+      margin-top: 150px;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-style: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="box">Hello ! Good Morning.</div>
+<button id="btn">Start Animation</button>
+
+<script>
+$(document).ready(function () {
+
+  $("#btn").click(function () {
+
+    $("#box")
+
+  
+    .animate({
+      top: "620px",
+      width: "120px",
+      height: "120px",
+      fontSize:"18 px",
+    }, 1000, function () {
+      $(this).css("background-color", "green");
+    })
+
+    
+    .animate({
+      left: "1400px",
+      opacity: 0.6,
+      fontSize:"12 px"
+    }, 1000, function () {
+      $(this).css("background-color", "green");
+    })
+
+    
+    .animate({
+      top: "0px",
+      width: "80px",
+      height: "80px",
+      fontSize:"16 px"
+    }, 1000, function () {
+      $(this).css("background-color", "purple");
+    })
+
+    
+    .animate({
+      left: "0px",
+      opacity: 1,
+      fontSize:"14 px"
+    }, 1000, function () {
+      $(this).css("background-color", "orange");
+    });
+
+  });
+
+});
+</script>
+
+</body>
+</html>
