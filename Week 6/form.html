@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Firebase Realtime DB Demo</title>
+</head>
+<body>
+  <h1>Firebase Realtime Database CRUD</h1>
+
+  <h2>Create / Write User</h2>
+  <form onsubmit="event.preventDefault(); createUserFromForm();">
+    <input type="text" id="create-id" placeholder="User ID" required />
+    <input type="text" id="create-name" placeholder="Name" required />
+    <input type="email" id="create-email" placeholder="Email" required />
+    <button type="submit">Write User</button>
+  </form>
+  <br />
+
+  <h2>Read All Users</h2>
+  <form onsubmit="event.preventDefault(); readAllUsersFromForm();">
+    <button type="submit">Read All Users</button>
+  </form>
+  <br />
+
+  <h2>Read User By ID</h2>
+  <form onsubmit="event.preventDefault(); readUserByIdFromForm();">
+    <input type="text" id="read-id" placeholder="User ID" required />
+    <button type="submit">Read User</button>
+  </form>
+  <br />
+
+  <h2>Update User</h2>
+  <form onsubmit="event.preventDefault(); updateUserFromForm();">
+    <input type="text" id="update-id" placeholder="User ID" required />
+    <input type="text" id="update-name" placeholder="New Name" required />
+    <input type="email" id="update-email" placeholder="New Email" required />
+    <button type="submit">Update User</button>
+  </form>
+  <br />
+
+  <h2>Update Email Only</h2>
+  <form onsubmit="event.preventDefault(); updateEmailOnlyFromForm();">
+    <input type="text" id="update-email-id" placeholder="User ID" required />
+    <input type="email" id="update-only-email" placeholder="Updated Email" required />
+    <button type="submit">Update Email</button>
+  </form>
+  <br />
+
+  <h2>Delete User</h2>
+  <form onsubmit="event.preventDefault(); deleteUserFromForm();">
+    <input type="text" id="delete-id" placeholder="User ID" required />
+    <button type="submit">Delete User</button>
+  </form>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import { get, getDatabase, ref, remove, set, update } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlRoKKH9XdZyNZtAKHcBeDSGJvFLaMEqQ",
+      authDomain: "voicecall23-d57f6.firebaseapp.com",
+      projectId: "voicecall23-d57f6",
+      storageBucket: "voicecall23-d57f6.firebasestorage.app",
+      messagingSenderId: "528194432546",
+      appId: "1:528194432546:web:d57b2aabfd678a13ec247b",
+      measurementId: "G-CKX3GJL36F"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    function showResult(title, data) {
+      console.log(title, data);
+    }
+
+    window.createUserFromForm = async function createUserFromForm() {
+      const userId = document.getElementById("create-id").value.trim();
+      const name = document.getElementById("create-name").value.trim();
+      const email = document.getElementById("create-email").value.trim();
+
+      await set(ref(db, "users/" + userId), { name, email });
+      showResult("User added successfully", { userId, name, email });
+    };
+
+    window.readAllUsersFromForm = async function readAllUsersFromForm() {
+      const snapshot = await get(ref(db, "users"));
+      showResult("All users", snapshot.exists() ? snapshot.val() : "No users found.");
+    };
+
+    window.readUserByIdFromForm = async function readUserByIdFromForm() {
+      const userId = document.getElementById("read-id").value.trim();
+      const snapshot = await get(ref(db, "users/" + userId));
+      showResult("User details", snapshot.exists() ? snapshot.val() : `No user found for ID: ${userId}`);
+    };
+
+    window.updateUserFromForm = async function updateUserFromForm() {
+      const userId = document.getElementById("update-id").value.trim();
+      const name = document.getElementById("update-name").value.trim();
+      const email = document.getElementById("update-email").value.trim();
+
+      await update(ref(db, "users/" + userId), { name, email });
+      showResult("User updated successfully", { userId, name, email });
+    };
+
+    window.updateEmailOnlyFromForm = async function updateEmailOnlyFromForm() {
+      const userId = document.getElementById("update-email-id").value.trim();
+      const email = document.getElementById("update-only-email").value.trim();
+
+      await update(ref(db, "users/" + userId), { email });
+      showResult("User email updated successfully", { userId, email });
+    };
+
+    window.deleteUserFromForm = async function deleteUserFromForm() {
+      const userId = document.getElementById("delete-id").value.trim();
+
+      await remove(ref(db, "users/" + userId));
+      showResult("User deleted successfully", { userId });
+    };
+  </script>
+</body>
+</html>
