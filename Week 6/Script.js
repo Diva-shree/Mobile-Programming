@@ -1,99 +1,122 @@
- 
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-database.js";
- 
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, update, remove }
+from "https://www.gstatic.com/firebasejs/12.12.0/firebase-database.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBR24c574p1u9L9HfZtHezI7egvwT9Ol1I",
-    authDomain: "mobile-programming-56d67.firebaseapp.com",
-    projectId: "mobile-programming-56d67",
-    storageBucket: "mobile-programming-56d67.firebasestorage.app",
-    messagingSenderId: "417693992122",
-    appId: "1:417693992122:web:d0362fef125622d71eae83",
-    measurementId: "G-CFBX0HVX9R"
-  };
+// 🔐 Your Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBR24c574p1u9L9HfZtHezI7egvwT9Ol1I",
+  authDomain: "mobile-programming-56d67.firebaseapp.com",
+  databaseURL: "https://mobile-programming-56d67-default-rtdb.firebaseio.com",
+  projectId: "mobile-programming-56d67",
+  storageBucket: "mobile-programming-56d67.firebasestorage.app",
+  messagingSenderId: "417693992122",
+  appId: "1:417693992122:web:d0362fef125622d71eae83",
+  measurementId: "G-CFBX0HVX9R"
+};
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-console.log(db);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-// Function to write user data to Firebase Realtime Database
-// Function to write user data with unique ID
-function writeUserData(userId, name, email) {
-  // Create a reference to 'users' collection
-  const usersRef = ref(db, 'users/' + userId);
+console.log("Firebase connected:", db);
 
-  // push() generates a unique key for the new child
-  //const newUserRef = push(usersRef);
-
-  // set() stores the data at that unique location
-  set(usersRef, {
-    name: name,
-    email: email
-  })
-  .then(() => {
-    console.log("User added successfully with ID:", userId);
-  })
-  .catch((error) => {
-    console.error("Error adding user:", error);
-  });
+// Utility
+function showResult(title, data) {
+  console.log(title, data);
+  alert(title + "\n" + JSON.stringify(data, null, 2));
 }
 
-// Expose the function to the global scope so it can be accessed from HTML (e.g., via button click)
-window.writeUserData = writeUserData();
+// CREATE MESSAGE
+window.createMessageFromForm = async function () {
+  try {
+    const id = document.getElementById("contact-id").value.trim();
+    const name = document.getElementById("contact-name").value.trim();
+    const email = document.getElementById("contact-email").value.trim();
+    const subject = document.getElementById("contact-subject").value.trim();
+    const message = document.getElementById("contact-message").value.trim();
 
+    if (!id) return alert("ID is required");
 
-// ref(db, 'users') points to the users path.
-// get(userRef) gets the data at that path.
-// snapshot.forEach(...) loops over each child node (each user).
-// childsnapshot.val() gives the actual data (name and email), which is printed.
-function readUser(){
-    const userRef = ref(db,'users')
-    get(userRef).then((snapshot)=>{
-        snapshot.forEach((childsnapshot)=>{
-            console.log(childsnapshot.val());
-        })
-    })
-}
-//readUser()
-window.readUser = readUser;
-
-
-
-function updateUserData(userId, updatedData) {
-  const userRef = ref(db, 'users/' + userId);
-  update(userRef, updatedData)
-    .then(() => {
-      console.log("User updated successfully");
-    })
-    .catch((error) => {
-      console.error("Error updating user:", error);
+    await set(ref(db, "contacts/" + id), {
+      name,
+      email,
+      subject,
+      message,
+      timestamp: Date.now()
     });
-}
 
-// Example usage:
-//updateUserData();
-window.updateUserData = updateUserData;
+    showResult("✅ Message sent successfully", { id, name });
 
+  } catch (error) {
+    alert("❌ Error: " + error.message);
+  }
+};
 
+// READ ALL
+window.readAllMessagesFromForm = async function () {
+  try {
+    const snapshot = await get(ref(db, "contacts"));
 
-function deleteUserData(userId) {
-  const userRef = ref(db, 'users/' + userId);
-  remove(userRef)
-    .then(() => {
-      console.log("User deleted successfully");
-    })
-    .catch((error) => {
-      console.error("Error deleting user:", error);
+    if (snapshot.exists()) {
+      showResult("📩 All messages", snapshot.val());
+    } else {
+      alert("No messages found.");
+    }
+
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+};
+
+// READ BY ID
+window.readMessageByIdFromForm = async function () {
+  try {
+    const id = document.getElementById("read-contact-id").value.trim();
+
+    const snapshot = await get(ref(db, "contacts/" + id));
+
+    if (snapshot.exists()) {
+      showResult("📄 Message details", snapshot.val());
+    } else {
+      alert("No message found.");
+    }
+
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+};
+
+// UPDATE
+window.updateMessageFromForm = async function () {
+  try {
+    const id = document.getElementById("update-contact-id").value.trim();
+    const name = document.getElementById("update-contact-name").value.trim();
+    const email = document.getElementById("update-contact-email").value.trim();
+    const message = document.getElementById("update-contact-message").value.trim();
+
+    await update(ref(db, "contacts/" + id), {
+      name,
+      email,
+      message
     });
-}
 
-// Example usage:
-//deleteUserData(2);
-window.deleteUserData = deleteUserData;
+    showResult("✏️ Message updated successfully", { id });
+
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+};
+
+// DELETE
+window.deleteMessageFromForm = async function () {
+  try {
+    const id = document.getElementById("delete-contact-id").value.trim();
+
+    await remove(ref(db, "contacts/" + id));
+
+    showResult("🗑️ Message deleted successfully", { id });
+
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+};
